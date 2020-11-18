@@ -277,46 +277,6 @@ public struct Reducer<State, Action, Environment> {
     }
   }
 
-  /// Transforms a reducer that works on non-optional state into one that works on optional state by
-  /// only running the non-optional reducer when state is non-nil.
-  ///
-  /// Often used in tandem with `pullback` to transform a reducer on a non-optional local domain
-  /// into a reducer that can be combined with a reducer on a global domain that contains some
-  /// optional local domain:
-  ///
-  ///     // Global domain that holds an optional local domain:
-  ///     struct AppState { var modal: ModalState? }
-  ///     struct AppAction { case modal(ModalAction) }
-  ///     struct AppEnvironment { var mainQueue: AnySchedulerOf<DispatchQueue> }
-  ///
-  ///     // A reducer that works on the non-optional local domain:
-  ///     let modalReducer = Reducer<ModalState, ModalAction, ModalEnvironment { ... }
-  ///
-  ///     // Pullback the local modal reducer so that it works on all of the app domain:
-  ///     let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
-  ///       modalReducer.optional().pullback(
-  ///         state: \.modal,
-  ///         action: /AppAction.modal,
-  ///         environment: { ModalEnvironment(mainQueue: $0.mainQueue) }
-  ///       ),
-  ///       Reducer { state, action, environment in
-  ///         ...
-  ///       }
-  ///     )
-  ///
-  /// Take care when combining optional reducers into parent domains, as order matters. Always
-  /// combine optional reducers _before_ parent reducers that can `nil` out the associated optional
-  /// state.
-  ///
-  /// - See also: `IfLetStore`, a SwiftUI helper for transforming a store on optional state into a
-  ///   store on non-optional state.
-  /// - See also: `Store.ifLet`, a UIKit helper for doing imperative work with a store on optional
-  ///   state.
-  @available(*, deprecated, message: "Use pullback with OptionalPath(\\.localState) instead")
-  public var optional: Reducer<State?, Action, Environment> {
-    self.pullback(state: OptionalPath(\.self), action: \.self, environment: { $0 })
-  }
-
   /// A version of `pullback` that transforms a reducer that works on an element into one that works
   /// on a collection of elements.
   ///

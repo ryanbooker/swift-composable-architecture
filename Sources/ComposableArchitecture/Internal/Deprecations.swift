@@ -24,10 +24,11 @@ extension Store {
 // NB: Deprecated after 0.6.0:
 
 extension Reducer {
-  @available(*, deprecated, renamed: "optional()")
-  public var optional: Reducer<State?, Action, Environment> {
-    self.optional()
-  }
+    @available(*, deprecated, message: "Use pullback with OptionalPath(\\.localState) instead")
+    public var optional: Reducer<State?, Action, Environment> {
+        self.pullback(state: OptionalPath(\.self), action: \.self, environment: { $0 }
+        )
+    }
 }
 
 // NB: Deprecated after 0.1.4:
